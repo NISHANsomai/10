@@ -1,0 +1,5524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#070707">
+
+<title>NOIR/INK — Tattoo & Piercing Studio</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+/* =========================================================
+   ROOT
+========================================================= */
+
+:root{
+    --black:#050505;
+    --bg:#080808;
+    --surface:#101010;
+    --surface2:#151515;
+
+    --white:#f5f3ed;
+    --muted:#858585;
+    --muted2:#555;
+
+    --line:rgba(255,255,255,.10);
+    --line2:rgba(255,255,255,.06);
+
+    --lime:#dfff35;
+    --lime-soft:rgba(223,255,53,.10);
+
+    --radius:26px;
+
+    --ease:cubic-bezier(.16,1,.3,1);
+}
+
+/* =========================================================
+   RESET
+========================================================= */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    background:var(--black);
+    color:var(--white);
+
+    font-family:"DM Sans",sans-serif;
+
+    overflow-x:hidden;
+}
+
+body.lock{
+    overflow:hidden;
+}
+
+a{
+    color:inherit;
+    text-decoration:none;
+}
+
+button,
+input,
+textarea,
+select{
+    font:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+img{
+    display:block;
+    width:100%;
+}
+
+/* =========================================================
+   GRAIN
+========================================================= */
+
+body::before{
+    content:"";
+
+    position:fixed;
+    inset:0;
+
+    pointer-events:none;
+
+    z-index:9999;
+
+    opacity:.035;
+
+    background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+/* =========================================================
+   PRELOADER
+========================================================= */
+
+.loader{
+    position:fixed;
+    inset:0;
+
+    z-index:10000;
+
+    background:#050505;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    transition:
+        opacity .8s var(--ease),
+        visibility .8s;
+}
+
+.loader.hide{
+    opacity:0;
+    visibility:hidden;
+}
+
+.loader-inner{
+    width:min(400px,80%);
+}
+
+.loader-top{
+    display:flex;
+    justify-content:space-between;
+
+    font-family:"DM Mono";
+    font-size:10px;
+
+    color:#666;
+
+    margin-bottom:12px;
+}
+
+.loader-line{
+    height:1px;
+    background:#222;
+
+    overflow:hidden;
+}
+
+.loader-progress{
+    width:0%;
+    height:100%;
+
+    background:var(--lime);
+
+    transition:width .1s linear;
+}
+
+/* =========================================================
+   SCROLL PROGRESS
+========================================================= */
+
+.scroll-progress{
+    position:fixed;
+    top:0;
+    left:0;
+
+    height:2px;
+    width:0%;
+
+    background:var(--lime);
+
+    z-index:9998;
+
+    box-shadow:0 0 15px rgba(223,255,53,.5);
+}
+
+/* =========================================================
+   CURSOR
+========================================================= */
+
+.cursor{
+    position:fixed;
+
+    width:14px;
+    height:14px;
+
+    border:1px solid var(--lime);
+    border-radius:50%;
+
+    pointer-events:none;
+
+    z-index:9997;
+
+    transform:translate(-50%,-50%);
+
+    transition:
+        width .35s var(--ease),
+        height .35s var(--ease),
+        background .35s,
+        border-color .35s;
+
+    mix-blend-mode:difference;
+}
+
+.cursor-dot{
+    position:fixed;
+
+    width:4px;
+    height:4px;
+
+    background:var(--lime);
+    border-radius:50%;
+
+    pointer-events:none;
+
+    z-index:9998;
+
+    transform:translate(-50%,-50%);
+}
+
+.cursor.big{
+    width:60px;
+    height:60px;
+
+    background:rgba(223,255,53,.08);
+}
+
+.cursor.text{
+    width:90px;
+    height:90px;
+
+    background:var(--lime);
+    border-color:var(--lime);
+
+    mix-blend-mode:normal;
+}
+
+.cursor.text::after{
+    content:"VIEW";
+
+    position:absolute;
+
+    inset:0;
+
+    display:grid;
+    place-items:center;
+
+    color:#050505;
+
+    font-size:9px;
+    font-weight:700;
+    letter-spacing:.1em;
+}
+
+/* =========================================================
+   BACKGROUND ORBS
+========================================================= */
+
+.ambient{
+    position:fixed;
+    inset:0;
+
+    pointer-events:none;
+
+    overflow:hidden;
+
+    z-index:-1;
+}
+
+.orb{
+    position:absolute;
+
+    width:500px;
+    height:500px;
+
+    border-radius:50%;
+
+    filter:blur(120px);
+
+    opacity:.045;
+
+    background:var(--lime);
+
+    animation:orbFloat 12s ease-in-out infinite alternate;
+}
+
+.orb.one{
+    top:-250px;
+    left:-180px;
+}
+
+.orb.two{
+    right:-300px;
+    top:35%;
+
+    width:600px;
+    height:600px;
+
+    animation-delay:-4s;
+}
+
+.orb.three{
+    left:30%;
+    bottom:-400px;
+
+    animation-delay:-8s;
+}
+
+@keyframes orbFloat{
+    from{
+        transform:translate3d(-20px,-10px,0) scale(1);
+    }
+
+    to{
+        transform:translate3d(30px,30px,0) scale(1.12);
+    }
+}
+
+/* =========================================================
+   NAV
+========================================================= */
+
+.nav{
+    position:fixed;
+
+    top:18px;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    width:min(1180px,92%);
+
+    z-index:500;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    padding:10px 11px 10px 18px;
+
+    background:rgba(10,10,10,.58);
+
+    border:1px solid rgba(255,255,255,.10);
+
+    backdrop-filter:blur(24px);
+    -webkit-backdrop-filter:blur(24px);
+
+    border-radius:999px;
+
+    transition:
+        transform .5s var(--ease),
+        background .4s,
+        border-color .4s;
+}
+
+.nav.scrolled{
+    background:rgba(7,7,7,.88);
+
+    border-color:rgba(223,255,53,.12);
+}
+
+.nav-logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+
+    font-family:"Space Grotesk";
+    font-weight:700;
+
+    letter-spacing:-.06em;
+}
+
+.logo-symbol{
+    width:34px;
+    height:34px;
+
+    display:grid;
+    place-items:center;
+
+    border:1px solid rgba(223,255,53,.35);
+    border-radius:50%;
+
+    color:var(--lime);
+
+    font-size:13px;
+
+    background:rgba(223,255,53,.04);
+}
+
+.nav-logo span{
+    color:var(--lime);
+}
+
+.nav-links{
+    display:flex;
+    align-items:center;
+    gap:30px;
+}
+
+.nav-links a{
+    position:relative;
+
+    color:#898989;
+
+    font-size:12px;
+
+    transition:.3s;
+}
+
+.nav-links a::after{
+    content:"";
+
+    position:absolute;
+
+    left:0;
+    bottom:-7px;
+
+    width:0;
+    height:1px;
+
+    background:var(--lime);
+
+    transition:.35s var(--ease);
+}
+
+.nav-links a:hover{
+    color:white;
+}
+
+.nav-links a:hover::after{
+    width:100%;
+}
+
+.nav-book{
+    border:0;
+
+    padding:12px 18px;
+
+    border-radius:999px;
+
+    background:var(--lime);
+    color:#050505;
+
+    font-size:11px;
+    font-weight:700;
+
+    transition:
+        transform .3s var(--ease),
+        box-shadow .3s;
+}
+
+.nav-book:hover{
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 10px 30px rgba(223,255,53,.16);
+}
+
+.menu-btn{
+    display:none;
+
+    width:38px;
+    height:38px;
+
+    border:1px solid var(--line);
+
+    border-radius:50%;
+
+    background:#111;
+    color:white;
+}
+
+/* =========================================================
+   MOBILE NAV
+========================================================= */
+
+.mobile-menu{
+    position:fixed;
+
+    inset:0;
+
+    background:#080808;
+
+    z-index:450;
+
+    display:flex;
+    align-items:center;
+
+    padding:100px 7%;
+
+    transform:translateY(-100%);
+
+    transition:transform .7s var(--ease);
+}
+
+.mobile-menu.open{
+    transform:translateY(0);
+}
+
+.mobile-menu-links{
+    display:grid;
+    gap:15px;
+}
+
+.mobile-menu-links a{
+    font-family:"Space Grotesk";
+
+    font-size:clamp(45px,12vw,80px);
+
+    line-height:.9;
+
+    letter-spacing:-.07em;
+
+    color:#555;
+
+    transition:.3s;
+}
+
+.mobile-menu-links a:hover{
+    color:var(--lime);
+}
+
+/* =========================================================
+   CONTAINER
+========================================================= */
+
+.container{
+    width:min(1180px,92%);
+    margin:auto;
+}
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.hero{
+    min-height:100svh;
+
+    position:relative;
+
+    display:flex;
+    align-items:center;
+
+    overflow:hidden;
+
+    padding:150px 0 100px;
+}
+
+.hero-media{
+    position:absolute;
+    inset:0;
+
+    overflow:hidden;
+}
+
+.hero-media img{
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+
+    object-position:center;
+
+    filter:
+        grayscale(.25)
+        contrast(1.08)
+        brightness(.62);
+
+    transform:scale(1.08);
+
+    animation:
+        heroImage 12s var(--ease) forwards;
+}
+
+@keyframes heroImage{
+    to{
+        transform:scale(1);
+    }
+}
+
+.hero-vignette{
+    position:absolute;
+    inset:0;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(5,5,5,.97) 0%,
+            rgba(5,5,5,.83) 32%,
+            rgba(5,5,5,.18) 75%,
+            rgba(5,5,5,.72) 100%
+        ),
+        linear-gradient(
+            0deg,
+            #050505 0%,
+            transparent 30%,
+            rgba(5,5,5,.15) 100%
+        );
+}
+
+.hero-grid{
+    position:absolute;
+    inset:0;
+
+    opacity:.08;
+
+    background-image:
+        linear-gradient(rgba(255,255,255,.09) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.09) 1px,transparent 1px);
+
+    background-size:80px 80px;
+
+    mask-image:
+        linear-gradient(
+            to bottom,
+            black,
+            transparent 85%
+        );
+}
+
+.hero-content{
+    position:relative;
+
+    z-index:3;
+
+    max-width:850px;
+}
+
+.hero-kicker{
+    display:flex;
+    align-items:center;
+    gap:10px;
+
+    margin-bottom:28px;
+
+    color:#999;
+
+    font-family:"DM Mono";
+    font-size:10px;
+
+    text-transform:uppercase;
+    letter-spacing:.16em;
+
+    opacity:0;
+
+    animation:fadeUp .9s .3s var(--ease) forwards;
+}
+
+.hero-kicker i{
+    width:7px;
+    height:7px;
+
+    border-radius:50%;
+
+    background:var(--lime);
+
+    box-shadow:0 0 20px var(--lime);
+}
+
+.hero-title{
+    font-family:"Space Grotesk";
+
+    font-size:clamp(76px,12vw,158px);
+
+    line-height:.77;
+
+    letter-spacing:-.095em;
+
+    font-weight:700;
+}
+
+.hero-title .line{
+    display:block;
+
+    overflow:hidden;
+}
+
+.hero-title .word{
+    display:inline-block;
+
+    transform:translateY(110%);
+
+    animation:
+        titleIn 1.15s var(--ease) forwards;
+}
+
+.hero-title .line:nth-child(1) .word{
+    animation-delay:.4s;
+}
+
+.hero-title .line:nth-child(2) .word{
+    animation-delay:.52s;
+}
+
+.hero-title .line:nth-child(3) .word{
+    animation-delay:.64s;
+}
+
+.hero-title em{
+    color:var(--lime);
+    font-style:normal;
+}
+
+@keyframes titleIn{
+    to{
+        transform:translateY(0);
+    }
+}
+
+.hero-description{
+    max-width:540px;
+
+    color:#aaa;
+
+    line-height:1.75;
+
+    font-size:15px;
+
+    margin-top:36px;
+
+    opacity:0;
+
+    animation:
+        fadeUp .9s .9s var(--ease) forwards;
+}
+
+.hero-actions{
+    display:flex;
+    gap:10px;
+
+    margin-top:30px;
+
+    flex-wrap:wrap;
+
+    opacity:0;
+
+    animation:
+        fadeUp .9s 1.05s var(--ease) forwards;
+}
+
+.btn{
+    position:relative;
+
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+
+    padding:15px 22px;
+
+    border-radius:999px;
+
+    border:1px solid var(--line);
+
+    font-size:12px;
+    font-weight:700;
+
+    overflow:hidden;
+
+    transition:
+        transform .35s var(--ease),
+        border-color .35s,
+        background .35s;
+}
+
+.btn span{
+    position:relative;
+    z-index:2;
+}
+
+.btn-primary{
+    color:#050505;
+    background:var(--lime);
+    border-color:var(--lime);
+}
+
+.btn-primary::before{
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    background:white;
+
+    transform:translateY(100%);
+
+    transition:transform .45s var(--ease);
+}
+
+.btn-primary:hover::before{
+    transform:translateY(0);
+}
+
+.btn-secondary{
+    background:rgba(255,255,255,.04);
+
+    backdrop-filter:blur(10px);
+}
+
+.btn-secondary:hover{
+    background:rgba(255,255,255,.10);
+
+    transform:translateY(-3px);
+}
+
+.hero-bottom{
+    margin-top:70px;
+
+    display:flex;
+    gap:50px;
+
+    opacity:0;
+
+    animation:
+        fadeUp .9s 1.2s var(--ease) forwards;
+}
+
+.hero-stat strong{
+    display:block;
+
+    font-family:"Space Grotesk";
+
+    font-size:28px;
+}
+
+.hero-stat span{
+    display:block;
+
+    margin-top:5px;
+
+    color:#666;
+
+    font-family:"DM Mono";
+    font-size:9px;
+
+    text-transform:uppercase;
+    letter-spacing:.1em;
+}
+
+.hero-scroll{
+    position:absolute;
+
+    right:4%;
+    bottom:50px;
+
+    z-index:4;
+
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    writing-mode:vertical-rl;
+
+    color:#666;
+
+    font-family:"DM Mono";
+    font-size:9px;
+
+    text-transform:uppercase;
+    letter-spacing:.15em;
+}
+
+.scroll-line{
+    width:1px;
+    height:55px;
+
+    background:linear-gradient(
+        to bottom,
+        var(--lime),
+        transparent
+    );
+
+    animation:scrollPulse 1.8s infinite;
+}
+
+@keyframes scrollPulse{
+    0%,100%{
+        transform:scaleY(.4);
+        transform-origin:top;
+    }
+
+    50%{
+        transform:scaleY(1);
+        transform-origin:top;
+    }
+}
+
+/* =========================================================
+   GENERAL SECTION
+========================================================= */
+
+section{
+    padding:140px 0;
+    position:relative;
+}
+
+.section-top{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+
+    gap:40px;
+
+    margin-bottom:55px;
+}
+
+.section-kicker{
+    color:var(--lime);
+
+    font-family:"DM Mono";
+    font-size:10px;
+
+    text-transform:uppercase;
+    letter-spacing:.17em;
+
+    margin-bottom:15px;
+}
+
+.section-title{
+    font-family:"Space Grotesk";
+
+    font-size:clamp(50px,7vw,90px);
+
+    line-height:.82;
+
+    letter-spacing:-.085em;
+}
+
+.section-copy{
+    max-width:400px;
+
+    color:#777;
+
+    font-size:13px;
+
+    line-height:1.8;
+}
+
+/* =========================================================
+   SCROLL REVEAL
+========================================================= */
+
+.reveal{
+    opacity:0;
+
+    transform:
+        translateY(50px)
+        scale(.98);
+
+    transition:
+        opacity 1s var(--ease),
+        transform 1s var(--ease);
+}
+
+.reveal.visible{
+    opacity:1;
+
+    transform:
+        translateY(0)
+        scale(1);
+}
+
+.reveal-delay-1{
+    transition-delay:.1s;
+}
+
+.reveal-delay-2{
+    transition-delay:.2s;
+}
+
+.reveal-delay-3{
+    transition-delay:.3s;
+}
+
+/* =========================================================
+   SERVICES
+========================================================= */
+
+.services-grid{
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap:12px;
+}
+
+.service-card{
+    position:relative;
+
+    min-height:330px;
+
+    padding:28px;
+
+    border:1px solid var(--line);
+
+    border-radius:var(--radius);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.055),
+            rgba(255,255,255,.012)
+        );
+
+    overflow:hidden;
+
+    transform-style:preserve-3d;
+
+    transition:
+        border-color .4s,
+        background .4s;
+}
+
+.service-card:hover{
+    border-color:rgba(223,255,53,.28);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(223,255,53,.07),
+            rgba(255,255,255,.015)
+        );
+}
+
+.card-glow{
+    position:absolute;
+
+    width:180px;
+    height:180px;
+
+    border-radius:50%;
+
+    background:var(--lime);
+
+    filter:blur(80px);
+
+    opacity:0;
+
+    pointer-events:none;
+
+    transform:translate(-50%,-50%);
+
+    transition:opacity .4s;
+}
+
+.service-card:hover .card-glow{
+    opacity:.10;
+}
+
+.service-number{
+    color:#555;
+
+    font-family:"DM Mono";
+    font-size:10px;
+}
+
+.service-icon{
+    width:58px;
+    height:58px;
+
+    display:grid;
+    place-items:center;
+
+    margin-top:45px;
+    margin-bottom:27px;
+
+    border:1px solid rgba(223,255,53,.18);
+
+    border-radius:18px;
+
+    color:var(--lime);
+
+    font-size:22px;
+
+    background:rgba(223,255,53,.04);
+
+    transform:translateZ(25px);
+}
+
+.service-card h3{
+    font-family:"Space Grotesk";
+
+    font-size:24px;
+
+    letter-spacing:-.04em;
+
+    transform:translateZ(20px);
+}
+
+.service-card p{
+    max-width:280px;
+
+    margin-top:11px;
+
+    color:#707070;
+
+    font-size:12px;
+
+    line-height:1.7;
+
+    transform:translateZ(15px);
+}
+
+.service-arrow{
+    position:absolute;
+
+    right:25px;
+    bottom:23px;
+
+    color:#444;
+
+    transition:.35s;
+}
+
+.service-card:hover .service-arrow{
+    color:var(--lime);
+
+    transform:translate(5px,-5px);
+}
+
+/* =========================================================
+   CINEMATIC IMAGE SECTION
+========================================================= */
+
+.cinematic{
+    min-height:750px;
+
+    display:flex;
+    align-items:flex-end;
+
+    overflow:hidden;
+
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+}
+
+.cinematic-media{
+    position:absolute;
+    inset:0;
+}
+
+.cinematic-media img{
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+
+    filter:
+        grayscale(.3)
+        contrast(1.1)
+        brightness(.55);
+
+    transform:scale(1.15);
+
+    transition:
+        transform 1.8s var(--ease);
+}
+
+.cinematic.visible .cinematic-media img{
+    transform:scale(1);
+}
+
+.cinematic::after{
+    content:"";
+
+    position:absolute;
+    inset:0;
+
+    background:
+        linear-gradient(
+            0deg,
+            rgba(5,5,5,.95),
+            rgba(5,5,5,.1) 70%
+        );
+}
+
+.cinematic-content{
+    position:relative;
+
+    z-index:2;
+
+    width:100%;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+
+    gap:50px;
+}
+
+.cinematic-title{
+    max-width:800px;
+
+    font-family:"Space Grotesk";
+
+    font-size:clamp(55px,9vw,120px);
+
+    line-height:.82;
+
+    letter-spacing:-.09em;
+}
+
+.cinematic-title em{
+    color:var(--lime);
+
+    font-style:normal;
+}
+
+.cinematic-side{
+    width:250px;
+
+    color:#aaa;
+
+    font-size:12px;
+
+    line-height:1.8;
+}
+
+/* =========================================================
+   ARTISTS
+========================================================= */
+
+.artists-grid{
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap:13px;
+}
+
+.artist{
+    position:relative;
+
+    height:580px;
+
+    overflow:hidden;
+
+    border-radius:var(--radius);
+
+    border:1px solid var(--line);
+
+    transform-style:preserve-3d;
+}
+
+.artist img{
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+
+    filter:
+        grayscale(.45)
+        contrast(1.05);
+
+    transition:
+        transform 1s var(--ease),
+        filter .8s;
+}
+
+.artist:hover img{
+    transform:scale(1.07);
+
+    filter:
+        grayscale(0)
+        contrast(1.05);
+}
+
+.artist-overlay{
+    position:absolute;
+    inset:0;
+
+    background:
+        linear-gradient(
+            0deg,
+            rgba(0,0,0,.94),
+            transparent 62%
+        );
+}
+
+.artist-info{
+    position:absolute;
+
+    left:25px;
+    right:25px;
+    bottom:25px;
+
+    transform:translateZ(35px);
+}
+
+.artist-role{
+    color:var(--lime);
+
+    font-family:"DM Mono";
+    font-size:9px;
+
+    text-transform:uppercase;
+    letter-spacing:.14em;
+
+    margin-bottom:8px;
+}
+
+.artist-name{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    font-family:"Space Grotesk";
+
+    font-size:30px;
+
+    letter-spacing:-.05em;
+}
+
+.artist-info p{
+    color:#888;
+
+    font-size:11px;
+
+    margin-top:6px;
+}
+
+.artist-number{
+    color:#555;
+
+    font-family:"DM Mono";
+    font-size:10px;
+}
+
+/* =========================================================
+   HORIZONTAL WORK
+========================================================= */
+
+.work-section{
+    overflow:hidden;
+}
+
+.work-track-wrap{
+    overflow:hidden;
+
+    width:100%;
+}
+
+.work-track{
+    display:flex;
+
+    gap:16px;
+
+    width:max-content;
+
+    padding-left:4%;
+
+    will-change:transform;
+}
+
+.work-card{
+    position:relative;
+
+    width:390px;
+    height:510px;
+
+    flex-shrink:0;
+
+    overflow:hidden;
+
+    border-radius:22px;
+
+    border:1px solid var(--line);
+
+    background:#111;
+}
+
+.work-card.large{
+    width:560px;
+}
+
+.work-card img{
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+
+    filter:
+        grayscale(.25)
+        contrast(1.06);
+
+    transition:
+        transform 1s var(--ease),
+        filter .7s;
+}
+
+.work-card:hover img{
+    transform:scale(1.06);
+
+    filter:
+        grayscale(0)
+        contrast(1.08);
+}
+
+.work-card::after{
+    content:"";
+
+    position:absolute;
+    inset:0;
+
+    background:
+        linear-gradient(
+            0deg,
+            rgba(0,0,0,.82),
+            transparent 60%
+        );
+}
+
+.work-info{
+    position:absolute;
+
+    left:22px;
+    right:22px;
+    bottom:22px;
+
+    z-index:2;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+}
+
+.work-info h3{
+    font-family:"Space Grotesk";
+
+    font-size:23px;
+
+    letter-spacing:-.04em;
+}
+
+.work-info span{
+    color:var(--lime);
+
+    font-family:"DM Mono";
+
+    font-size:9px;
+
+    text-transform:uppercase;
+}
+
+/* =========================================================
+   INK PROCESS
+========================================================= */
+
+.process{
+    display:grid;
+
+    grid-template-columns:
+        1fr 1.5fr;
+
+    gap:80px;
+}
+
+.process-intro{
+    position:sticky;
+
+    top:130px;
+
+    height:max-content;
+}
+
+.process-intro h2{
+    font-family:"Space Grotesk";
+
+    font-size:clamp(55px,7vw,95px);
+
+    line-height:.8;
+
+    letter-spacing:-.09em;
+}
+
+.process-intro p{
+    max-width:350px;
+
+    color:#707070;
+
+    font-size:13px;
+
+    line-height:1.8;
+
+    margin-top:25px;
+}
+
+.process-list{
+    border-top:1px solid var(--line);
+}
+
+.process-row{
+    position:relative;
+
+    display:grid;
+
+    grid-template-columns:80px 1fr 50px;
+
+    align-items:center;
+
+    min-height:150px;
+
+    border-bottom:1px solid var(--line);
+
+    overflow:hidden;
+}
+
+.process-row::before{
+    content:"";
+
+    position:absolute;
+    inset:0;
+
+    background:var(--lime);
+
+    transform:translateX(-101%);
+
+    transition:transform .65s var(--ease);
+
+    z-index:-1;
+}
+
+.process-row:hover::before{
+    transform:translateX(0);
+}
+
+.process-row:hover{
+    color:#050505;
+}
+
+.process-row:hover .process-description{
+    color:#222;
+}
+
+.process-number{
+    font-family:"DM Mono";
+
+    font-size:11px;
+
+    color:#666;
+
+    transition:.3s;
+}
+
+.process-row:hover .process-number{
+    color:#222;
+}
+
+.process-name{
+    font-family:"Space Grotesk";
+
+    font-size:30px;
+
+    letter-spacing:-.05em;
+}
+
+.process-description{
+    color:#666;
+
+    font-size:11px;
+
+    margin-top:6px;
+
+    transition:.3s;
+}
+
+.process-arrow{
+    font-size:22px;
+
+    transition:.4s var(--ease);
+}
+
+.process-row:hover .process-arrow{
+    transform:rotate(-45deg);
+}
+
+/* =========================================================
+   PIERCING
+========================================================= */
+
+.piercing-wrap{
+    display:grid;
+
+    grid-template-columns:
+        .9fr 1.1fr;
+
+    gap:14px;
+}
+
+.piercing-image{
+    position:relative;
+
+    min-height:650px;
+
+    overflow:hidden;
+
+    border-radius:var(--radius);
+
+    border:1px solid var(--line);
+}
+
+.piercing-image img{
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+
+    filter:
+        grayscale(.25)
+        contrast(1.08);
+
+    transition:
+        transform 1.2s var(--ease);
+}
+
+.piercing-image:hover img{
+    transform:scale(1.05);
+}
+
+.piercing-glow{
+    position:absolute;
+
+    width:200px;
+    height:200px;
+
+    background:var(--lime);
+
+    border-radius:50%;
+
+    filter:blur(90px);
+
+    opacity:.08;
+
+    right:-80px;
+    top:-80px;
+}
+
+.piercing-content{
+    padding:55px;
+
+    border:1px solid var(--line);
+
+    border-radius:var(--radius);
+
+    background:
+        radial-gradient(
+            circle at 100% 0,
+            rgba(223,255,53,.07),
+            transparent 35%
+        ),
+        #101010;
+}
+
+.piercing-content h2{
+    font-family:"Space Grotesk";
+
+    font-size:clamp(50px,6vw,82px);
+
+    line-height:.82;
+
+    letter-spacing:-.085em;
+}
+
+.piercing-content>p{
+    color:#777;
+
+    font-size:13px;
+
+    line-height:1.8;
+
+    max-width:480px;
+
+    margin-top:25px;
+}
+
+.piercing-options{
+    display:grid;
+
+    grid-template-columns:
+        repeat(2,1fr);
+
+    gap:8px;
+
+    margin-top:40px;
+}
+
+.piercing-option{
+    padding:18px;
+
+    border:1px solid var(--line);
+
+    border-radius:15px;
+
+    background:rgba(255,255,255,.025);
+
+    transition:
+        transform .4s var(--ease),
+        border-color .4s,
+        background .4s;
+}
+
+.piercing-option:hover{
+    transform:translateY(-5px);
+
+    border-color:rgba(223,255,53,.3);
+
+    background:rgba(223,255,53,.05);
+}
+
+.piercing-option strong{
+    display:block;
+
+    font-family:"Space Grotesk";
+
+    font-size:14px;
+}
+
+.piercing-option span{
+    display:block;
+
+    margin-top:5px;
+
+    color:#666;
+
+    font-size:10px;
+}
+
+/* =========================================================
+   EQUIPMENT
+========================================================= */
+
+.equipment{
+    position:relative;
+
+    min-height:700px;
+
+    overflow:hidden;
+
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+}
+
+.equipment-image{
+    position:absolute;
+    inset:0;
+}
+
+.equipment-image img{
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+
+    filter:
+        grayscale(.5)
+        contrast(1.15)
+        brightness(.45);
+
+    transform:scale(1.08);
+
+    transition:
+        transform 1.5s var(--ease);
+}
+
+.equipment.visible .equipment-image img{
+    transform:scale(1);
+}
+
+.equipment-content{
+    position:relative;
+
+    z-index:2;
+
+    min-height:700px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+}
+
+.equipment-content h2{
+    max-width:850px;
+
+    font-family:"Space Grotesk";
+
+    font-size:clamp(55px,9vw,120px);
+
+    line-height:.8;
+
+    letter-spacing:-.09em;
+}
+
+.equipment-content h2 span{
+    color:var(--lime);
+}
+
+.equipment-content p{
+    max-width:430px;
+
+    color:#aaa;
+
+    font-size:13px;
+
+    line-height:1.8;
+
+    margin-top:30px;
+}
+
+/* =========================================================
+   STATS
+========================================================= */
+
+.stats-grid{
+    display:grid;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+}
+
+.big-stat{
+    padding:45px 25px;
+
+    border-right:1px solid var(--line);
+}
+
+.big-stat:last-child{
+    border-right:0;
+}
+
+.big-number{
+    font-family:"Space Grotesk";
+
+    font-size:clamp(45px,6vw,75px);
+
+    line-height:1;
+
+    letter-spacing:-.07em;
+}
+
+.big-stat p{
+    margin-top:13px;
+
+    color:#666;
+
+    font-family:"DM Mono";
+
+    font-size:9px;
+
+    text-transform:uppercase;
+    letter-spacing:.12em;
+}
+
+/* =========================================================
+   TESTIMONIALS
+========================================================= */
+
+.testimonials{
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap:13px;
+}
+
+.testimonial{
+    padding:32px;
+
+    min-height:270px;
+
+    border:1px solid var(--line);
+
+    border-radius:22px;
+
+    background:#101010;
+
+    transition:
+        transform .5s var(--ease),
+        border-color .4s;
+}
+
+.testimonial:hover{
+    transform:translateY(-7px);
+
+    border-color:rgba(223,255,53,.2);
+}
+
+.stars{
+    color:var(--lime);
+
+    letter-spacing:3px;
+
+    font-size:11px;
+}
+
+.testimonial-text{
+    margin-top:25px;
+
+    color:#aaa;
+
+    font-size:14px;
+
+    line-height:1.8;
+}
+
+.client{
+    display:flex;
+    align-items:center;
+
+    gap:11px;
+
+    margin-top:28px;
+}
+
+.client-avatar{
+    width:38px;
+    height:38px;
+
+    border-radius:50%;
+
+    display:grid;
+    place-items:center;
+
+    background:#1b1b1b;
+
+    color:var(--lime);
+
+    font-family:"Space Grotesk";
+}
+
+.client strong{
+    display:block;
+
+    font-size:12px;
+}
+
+.client span{
+    display:block;
+
+    margin-top:3px;
+
+    color:#555;
+
+    font-family:"DM Mono";
+
+    font-size:8px;
+}
+
+/* =========================================================
+   FAQ
+========================================================= */
+
+.faq{
+    max-width:900px;
+
+    margin:auto;
+
+    border-top:1px solid var(--line);
+}
+
+.faq-item{
+    border-bottom:1px solid var(--line);
+}
+
+.faq-question{
+    width:100%;
+
+    padding:25px 0;
+
+    border:0;
+
+    background:none;
+
+    color:white;
+
+    display:flex;
+
+    justify-content:space-between;
+    align-items:center;
+
+    text-align:left;
+
+    font-family:"Space Grotesk";
+
+    font-size:18px;
+
+    letter-spacing:-.03em;
+}
+
+.faq-plus{
+    width:34px;
+    height:34px;
+
+    border:1px solid var(--line);
+
+    border-radius:50%;
+
+    display:grid;
+    place-items:center;
+
+    color:var(--lime);
+
+    transition:
+        transform .5s var(--ease),
+        background .3s;
+}
+
+.faq-answer{
+    display:grid;
+
+    grid-template-rows:0fr;
+
+    transition:grid-template-rows .5s var(--ease);
+}
+
+.faq-answer-inner{
+    overflow:hidden;
+}
+
+.faq-answer p{
+    max-width:650px;
+
+    padding-bottom:0;
+
+    color:#707070;
+
+    font-size:13px;
+
+    line-height:1.8;
+
+    opacity:0;
+
+    transform:translateY(-10px);
+
+    transition:
+        opacity .35s,
+        transform .35s,
+        padding .5s;
+}
+
+.faq-item.open .faq-answer{
+    grid-template-rows:1fr;
+}
+
+.faq-item.open .faq-answer p{
+    opacity:1;
+
+    transform:translateY(0);
+
+    padding-bottom:25px;
+}
+
+.faq-item.open .faq-plus{
+    transform:rotate(45deg);
+
+    background:var(--lime);
+
+    color:#050505;
+}
+
+/* =========================================================
+   BOOKING CTA
+========================================================= */
+
+.booking{
+    padding-bottom:160px;
+}
+
+.booking-box{
+    position:relative;
+
+    overflow:hidden;
+
+    min-height:500px;
+
+    padding:70px;
+
+    border:1px solid rgba(223,255,53,.16);
+
+    border-radius:32px;
+
+    background:
+        radial-gradient(
+            circle at 100% 0,
+            rgba(223,255,53,.11),
+            transparent 35%
+        ),
+        radial-gradient(
+            circle at 0 100%,
+            rgba(255,255,255,.04),
+            transparent 35%
+        ),
+        #0d0d0d;
+}
+
+.booking-ring{
+    position:absolute;
+
+    right:-100px;
+    bottom:-150px;
+
+    width:500px;
+    height:500px;
+
+    border:1px solid rgba(223,255,53,.10);
+
+    border-radius:50%;
+
+    animation:ringRotate 18s linear infinite;
+}
+
+.booking-ring::before,
+.booking-ring::after{
+    content:"";
+
+    position:absolute;
+
+    inset:35px;
+
+    border:1px solid rgba(223,255,53,.08);
+
+    border-radius:50%;
+}
+
+.booking-ring::after{
+    inset:75px;
+}
+
+@keyframes ringRotate{
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+.booking-box h2{
+    position:relative;
+    z-index:2;
+
+    max-width:800px;
+
+    font-family:"Space Grotesk";
+
+    font-size:clamp(60px,9vw,120px);
+
+    line-height:.78;
+
+    letter-spacing:-.095em;
+}
+
+.booking-box h2 span{
+    color:var(--lime);
+}
+
+.booking-box p{
+    position:relative;
+    z-index:2;
+
+    max-width:500px;
+
+    margin-top:28px;
+
+    color:#777;
+
+    font-size:13px;
+
+    line-height:1.8;
+}
+
+.booking-btn{
+    position:relative;
+    z-index:2;
+
+    margin-top:28px;
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+footer{
+    border-top:1px solid var(--line);
+
+    padding:60px 0 25px;
+}
+
+.footer-main{
+    display:flex;
+
+    justify-content:space-between;
+
+    gap:50px;
+}
+
+.footer-brand{
+    max-width:350px;
+}
+
+.footer-brand p{
+    color:#666;
+
+    font-size:12px;
+
+    line-height:1.8;
+
+    margin-top:18px;
+}
+
+.footer-columns{
+    display:flex;
+
+    gap:80px;
+}
+
+.footer-column{
+    display:grid;
+
+    align-content:start;
+
+    gap:12px;
+}
+
+.footer-column strong{
+    color:#555;
+
+    font-family:"DM Mono";
+
+    font-size:9px;
+
+    text-transform:uppercase;
+
+    letter-spacing:.15em;
+
+    margin-bottom:5px;
+}
+
+.footer-column a{
+    color:#888;
+
+    font-size:11px;
+
+    transition:.25s;
+}
+
+.footer-column a:hover{
+    color:var(--lime);
+}
+
+.footer-bottom{
+    display:flex;
+
+    justify-content:space-between;
+
+    margin-top:60px;
+
+    padding-top:20px;
+
+    border-top:1px solid var(--line);
+
+    color:#444;
+
+    font-family:"DM Mono";
+
+    font-size:8px;
+
+    text-transform:uppercase;
+
+    letter-spacing:.08em;
+}
+
+/* =========================================================
+   BOOKING MODAL
+========================================================= */
+
+.modal{
+    position:fixed;
+
+    inset:0;
+
+    z-index:6000;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    padding:20px;
+
+    background:rgba(0,0,0,.82);
+
+    backdrop-filter:blur(20px);
+
+    opacity:0;
+
+    visibility:hidden;
+
+    transition:
+        opacity .5s,
+        visibility .5s;
+}
+
+.modal.open{
+    opacity:1;
+    visibility:visible;
+}
+
+.modal-box{
+    width:min(680px,100%);
+
+    max-height:90vh;
+
+    overflow:auto;
+
+    position:relative;
+
+    padding:38px;
+
+    border:1px solid var(--line);
+
+    border-radius:26px;
+
+    background:#111;
+
+    transform:
+        translateY(30px)
+        scale(.96);
+
+    transition:
+        transform .6s var(--ease);
+}
+
+.modal.open .modal-box{
+    transform:none;
+}
+
+.modal-close{
+    position:absolute;
+
+    top:17px;
+    right:17px;
+
+    width:35px;
+    height:35px;
+
+    border:1px solid var(--line);
+
+    border-radius:50%;
+
+    background:#181818;
+
+    color:white;
+
+    font-size:18px;
+}
+
+.modal-box h2{
+    font-family:"Space Grotesk";
+
+    font-size:48px;
+
+    line-height:.9;
+
+    letter-spacing:-.07em;
+}
+
+.modal-box>p{
+    color:#666;
+
+    font-size:12px;
+
+    line-height:1.7;
+
+    margin-top:12px;
+
+    margin-bottom:28px;
+}
+
+.form-grid{
+    display:grid;
+
+    grid-template-columns:
+        repeat(2,1fr);
+
+    gap:11px;
+}
+
+.field{
+    display:grid;
+
+    gap:7px;
+}
+
+.field.full{
+    grid-column:1/-1;
+}
+
+.field label{
+    color:#555;
+
+    font-family:"DM Mono";
+
+    font-size:8px;
+
+    text-transform:uppercase;
+
+    letter-spacing:.12em;
+}
+
+.field input,
+.field select,
+.field textarea{
+    width:100%;
+
+    border:1px solid var(--line);
+
+    border-radius:12px;
+
+    padding:13px;
+
+    outline:none;
+
+    background:#181818;
+
+    color:white;
+
+    transition:.3s;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus{
+    border-color:rgba(223,255,53,.4);
+
+    background:#1b1b1b;
+}
+
+.field textarea{
+    min-height:110px;
+
+    resize:vertical;
+}
+
+.form-submit{
+    width:100%;
+
+    border:0;
+
+    margin-top:14px;
+
+    padding:15px;
+
+    border-radius:999px;
+
+    background:var(--lime);
+
+    color:#050505;
+
+    font-weight:800;
+
+    font-size:11px;
+}
+
+.form-success{
+    display:none;
+
+    text-align:center;
+
+    padding:50px 0 30px;
+}
+
+.form-success.show{
+    display:block;
+}
+
+.success-icon{
+    width:65px;
+    height:65px;
+
+    margin:auto;
+
+    display:grid;
+    place-items:center;
+
+    border-radius:50%;
+
+    background:rgba(223,255,53,.08);
+
+    color:var(--lime);
+
+    font-size:25px;
+}
+
+/* =========================================================
+   FLOATING INK PARTICLES
+========================================================= */
+
+.ink-particles{
+    position:absolute;
+
+    inset:0;
+
+    pointer-events:none;
+
+    overflow:hidden;
+}
+
+.particle{
+    position:absolute;
+
+    width:3px;
+    height:3px;
+
+    border-radius:50%;
+
+    background:var(--lime);
+
+    opacity:.2;
+
+    animation:
+        particleFloat var(--duration) linear infinite;
+}
+
+@keyframes particleFloat{
+    from{
+        transform:
+            translate3d(0,110vh,0)
+            scale(.5);
+    }
+
+    to{
+        transform:
+            translate3d(var(--x),-20vh,0)
+            scale(1.4);
+    }
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:950px){
+
+    .nav-links,
+    .nav-book{
+        display:none;
+    }
+
+    .menu-btn{
+        display:block;
+    }
+
+    .services-grid,
+    .artists-grid,
+    .testimonials{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .process{
+        grid-template-columns:1fr;
+
+        gap:50px;
+    }
+
+    .process-intro{
+        position:static;
+    }
+
+    .piercing-wrap{
+        grid-template-columns:1fr;
+    }
+
+    .piercing-image{
+        min-height:500px;
+    }
+
+    .stats-grid{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .big-stat:nth-child(2){
+        border-right:0;
+    }
+
+    .big-stat:nth-child(-n+2){
+        border-bottom:1px solid var(--line);
+    }
+
+    .cinematic{
+        min-height:650px;
+    }
+
+    .cinematic-content{
+        display:block;
+    }
+
+    .cinematic-side{
+        margin-top:25px;
+    }
+
+    .footer-main{
+        flex-direction:column;
+    }
+}
+
+@media(max-width:650px){
+
+    .container{
+        width:90%;
+    }
+
+    section{
+        padding:95px 0;
+    }
+
+    .hero{
+        min-height:900px;
+
+        padding-top:140px;
+    }
+
+    .hero-media img{
+        object-position:65% center;
+    }
+
+    .hero-vignette{
+        background:
+            linear-gradient(
+                0deg,
+                rgba(5,5,5,1) 3%,
+                rgba(5,5,5,.4) 65%,
+                rgba(5,5,5,.7)
+            );
+    }
+
+    .hero-title{
+        font-size:clamp(65px,18vw,105px);
+    }
+
+    .hero-description{
+        font-size:13px;
+    }
+
+    .hero-bottom{
+        gap:25px;
+
+        flex-wrap:wrap;
+
+        margin-top:45px;
+    }
+
+    .hero-scroll{
+        display:none;
+    }
+
+    .section-top{
+        display:block;
+
+        margin-bottom:40px;
+    }
+
+    .section-copy{
+        margin-top:22px;
+    }
+
+    .services-grid,
+    .artists-grid,
+    .testimonials{
+        grid-template-columns:1fr;
+    }
+
+    .service-card{
+        min-height:290px;
+    }
+
+    .artist{
+        height:470px;
+    }
+
+    .cinematic{
+        min-height:620px;
+    }
+
+    .cinematic-title{
+        font-size:65px;
+    }
+
+    .work-card{
+        width:290px;
+        height:420px;
+    }
+
+    .work-card.large{
+        width:340px;
+    }
+
+    .process-row{
+        grid-template-columns:45px 1fr 30px;
+
+        min-height:125px;
+    }
+
+    .process-name{
+        font-size:22px;
+    }
+
+    .piercing-content{
+        padding:30px;
+    }
+
+    .piercing-options{
+        grid-template-columns:1fr;
+    }
+
+    .piercing-image{
+        min-height:450px;
+    }
+
+    .equipment,
+    .equipment-content{
+        min-height:600px;
+    }
+
+    .equipment-content h2{
+        font-size:65px;
+    }
+
+    .stats-grid{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .big-stat{
+        padding:30px 15px;
+    }
+
+    .big-number{
+        font-size:48px;
+    }
+
+    .booking-box{
+        padding:35px 25px;
+
+        min-height:500px;
+    }
+
+    .booking-box h2{
+        font-size:65px;
+    }
+
+    .footer-columns{
+        gap:35px;
+
+        flex-wrap:wrap;
+    }
+
+    .footer-bottom{
+        flex-direction:column;
+
+        gap:10px;
+    }
+
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+
+    .field.full{
+        grid-column:auto;
+    }
+
+    .modal-box{
+        padding:28px 20px;
+    }
+
+    .cursor,
+    .cursor-dot{
+        display:none;
+    }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media(prefers-reduced-motion:reduce){
+
+    *,
+    *::before,
+    *::after{
+        animation-duration:.01ms !important;
+        animation-iteration-count:1 !important;
+        scroll-behavior:auto !important;
+        transition-duration:.01ms !important;
+    }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+<!-- ======================================================
+     LOADER
+====================================================== -->
+
+<div class="loader" id="loader">
+
+    <div class="loader-inner">
+
+        <div class="loader-top">
+
+            <span>NOIR/INK</span>
+
+            <span id="loaderPercent">00%</span>
+
+        </div>
+
+        <div class="loader-line">
+
+            <div class="loader-progress" id="loaderProgress"></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ======================================================
+     SCROLL PROGRESS
+====================================================== -->
+
+<div class="scroll-progress" id="scrollProgress"></div>
+
+
+<!-- ======================================================
+     CURSOR
+====================================================== -->
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+
+
+<!-- ======================================================
+     AMBIENT
+====================================================== -->
+
+<div class="ambient">
+
+    <div class="orb one"></div>
+    <div class="orb two"></div>
+    <div class="orb three"></div>
+
+</div>
+
+
+<!-- ======================================================
+     NAV
+====================================================== -->
+
+<nav class="nav" id="nav">
+
+    <a href="#" class="nav-logo">
+
+        <div class="logo-symbol">N</div>
+
+        NOIR<span>/INK</span>
+
+    </a>
+
+
+    <div class="nav-links">
+
+        <a href="#services">Services</a>
+
+        <a href="#artists">Artists</a>
+
+        <a href="#work">Work</a>
+
+        <a href="#piercing">Piercing</a>
+
+        <a href="#faq">FAQ</a>
+
+    </div>
+
+
+    <button class="nav-book magnetic" data-booking>
+        BOOK SESSION
+    </button>
+
+
+    <button class="menu-btn" id="menuButton">
+        ☰
+    </button>
+
+</nav>
+
+
+<!-- ======================================================
+     MOBILE MENU
+====================================================== -->
+
+<div class="mobile-menu" id="mobileMenu">
+
+    <div class="mobile-menu-links">
+
+        <a href="#services">Services</a>
+
+        <a href="#artists">Artists</a>
+
+        <a href="#work">Work</a>
+
+        <a href="#piercing">Piercing</a>
+
+        <a href="#faq">FAQ</a>
+
+        <a href="#booking">Book</a>
+
+    </div>
+
+</div>
+
+
+<!-- ======================================================
+     HERO
+====================================================== -->
+
+<header class="hero">
+
+    <div class="hero-media">
+
+        <img
+            src="https://images.pexels.com/photos/34123329/pexels-photo-34123329.jpeg?auto=compress&cs=tinysrgb&w=2200"
+            alt="Tattoo artist working with tattoo machine"
+        >
+
+    </div>
+
+
+    <div class="hero-vignette"></div>
+
+    <div class="hero-grid"></div>
+
+
+    <div class="ink-particles" id="particles"></div>
+
+
+    <div class="container">
+
+        <div class="hero-content">
+
+            <div class="hero-kicker">
+
+                <i></i>
+
+                Independent tattoo + piercing studio
+
+            </div>
+
+
+            <h1 class="hero-title">
+
+                <span class="line">
+                    <span class="word">INK</span>
+                </span>
+
+                <span class="line">
+                    <span class="word"><em>WITH</em></span>
+                </span>
+
+                <span class="line">
+                    <span class="word">INTENT.</span>
+                </span>
+
+            </h1>
+
+
+            <p class="hero-description">
+
+                Custom tattooing, considered design and professional
+                piercing for people who want something more personal
+                than a template.
+
+            </p>
+
+
+            <div class="hero-actions">
+
+                <a
+                    href="#booking"
+                    class="btn btn-primary magnetic"
+                >
+                    <span>START YOUR IDEA →</span>
+                </a>
+
+
+                <a
+                    href="#work"
+                    class="btn btn-secondary"
+                >
+                    <span>EXPLORE THE WORK</span>
+                </a>
+
+            </div>
+
+
+            <div class="hero-bottom">
+
+                <div class="hero-stat">
+
+                    <strong data-count="1200">0</strong>
+
+                    <span>
+                        Custom pieces
+                    </span>
+
+                </div>
+
+
+                <div class="hero-stat">
+
+                    <strong data-count="8">0</strong>
+
+                    <span>
+                        Years creating
+                    </span>
+
+                </div>
+
+
+                <div class="hero-stat">
+
+                    <strong data-count="3">0</strong>
+
+                    <span>
+                        Resident artists
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="hero-scroll">
+
+        <div class="scroll-line"></div>
+
+        Scroll to explore
+
+    </div>
+
+</header>
+
+
+<!-- ======================================================
+     SERVICES
+====================================================== -->
+
+<section id="services">
+
+    <div class="container">
+
+        <div class="section-top reveal">
+
+            <div>
+
+                <div class="section-kicker">
+                    01 / Services
+                </div>
+
+                <h2 class="section-title">
+                    MADE<br>
+                    PERSONAL.
+                </h2>
+
+            </div>
+
+
+            <p class="section-copy">
+
+                Every project begins with the idea, not a
+                predetermined template. Your artist shapes the
+                final direction around the concept.
+
+            </p>
+
+        </div>
+
+
+        <div class="services-grid">
+
+
+            <article class="service-card tilt reveal">
+
+                <div class="card-glow"></div>
+
+                <div class="service-number">
+                    01 / 06
+                </div>
+
+                <div class="service-icon">
+                    ✦
+                </div>
+
+                <h3>
+                    Custom Tattoo
+                </h3>
+
+                <p>
+                    Original artwork developed around your concept,
+                    references and preferred visual direction.
+                </p>
+
+                <div class="service-arrow">
+                    ↗
+                </div>
+
+            </article>
+
+
+            <article class="service-card tilt reveal reveal-delay-1">
+
+                <div class="card-glow"></div>
+
+                <div class="service-number">
+                    02 / 06
+                </div>
+
+                <div class="service-icon">
+                    ⌁
+                </div>
+
+                <h3>
+                    Fine Line
+                </h3>
+
+                <p>
+                    Precise linework and delicate compositions
+                    designed around clean visual detail.
+                </p>
+
+                <div class="service-arrow">
+                    ↗
+                </div>
+
+            </article>
+
+
+            <article class="service-card tilt reveal reveal-delay-2">
+
+                <div class="card-glow"></div>
+
+                <div class="service-number">
+                    03 / 06
+                </div>
+
+                <div class="service-icon">
+                    ◈
+                </div>
+
+                <h3>
+                    Blackwork
+                </h3>
+
+                <p>
+                    Graphic compositions built around contrast,
+                    shape and bold black ink.
+                </p>
+
+                <div class="service-arrow">
+                    ↗
+                </div>
+
+            </article>
+
+
+            <article class="service-card tilt reveal">
+
+                <div class="card-glow"></div>
+
+                <div class="service-number">
+                    04 / 06
+                </div>
+
+                <div class="service-icon">
+                    ◎
+                </div>
+
+                <h3>
+                    Realism
+                </h3>
+
+                <p>
+                    Detailed portrait and realistic artwork with
+                    careful attention to depth and texture.
+                </p>
+
+                <div class="service-arrow">
+                    ↗
+                </div>
+
+            </article>
+
+
+            <article class="service-card tilt reveal reveal-delay-1">
+
+                <div class="card-glow"></div>
+
+                <div class="service-number">
+                    05 / 06
+                </div>
+
+                <div class="service-icon">
+                    ↻
+                </div>
+
+                <h3>
+                    Cover Up
+                </h3>
+
+                <p>
+                    Thoughtful redesigns that work with existing
+                    ink to create a new visual direction.
+                </p>
+
+                <div class="service-arrow">
+                    ↗
+                </div>
+
+            </article>
+
+
+            <article class="service-card tilt reveal reveal-delay-2">
+
+                <div class="card-glow"></div>
+
+                <div class="service-number">
+                    06 / 06
+                </div>
+
+                <div class="service-icon">
+                    +
+                </div>
+
+                <h3>
+                    Piercing
+                </h3>
+
+                <p>
+                    Professional piercing with placement,
+                    jewelry and overall styling considered together.
+                </p>
+
+                <div class="service-arrow">
+                    ↗
+                </div>
+
+            </article>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ======================================================
+     CINEMATIC
+====================================================== -->
+
+<section class="cinematic">
+
+    <div class="cinematic-media">
+
+        <img
+            src="https://images.pexels.com/photos/20509829/pexels-photo-20509829.jpeg?auto=compress&cs=tinysrgb&w=2200"
+            alt="Tattoo artist holding a tattoo machine"
+        >
+
+    </div>
+
+
+    <div class="container cinematic-content">
+
+        <div>
+
+            <div class="section-kicker">
+                02 / The philosophy
+            </div>
+
+            <h2 class="cinematic-title">
+
+                CRAFT<br>
+
+                OVER <em>TREND.</em>
+
+            </h2>
+
+        </div>
+
+
+        <p class="cinematic-side">
+
+            Good tattooing is not about making the loudest
+            design. It is about making something that still
+            feels right long after the appointment.
+
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- ======================================================
+     ARTISTS
+====================================================== -->
+
+<section id="artists">
+
+    <div class="container">
+
+        <div class="section-top reveal">
+
+            <div>
+
+                <div class="section-kicker">
+                    03 / Artists
+                </div>
+
+                <h2 class="section-title">
+                    THE<br>
+                    CREW.
+                </h2>
+
+            </div>
+
+            <p class="section-copy">
+
+                Different styles. Different perspectives.
+                One standard: thoughtful work.
+
+            </p>
+
+        </div>
+
+
+        <div class="artists-grid">
+
+
+            <article class="artist tilt reveal">
+
+                <img
+                    src="https://images.pexels.com/photos/7005742/pexels-photo-7005742.jpeg?auto=compress&cs=tinysrgb&w=1300"
+                    alt="Tattoo artist working in studio"
+                >
+
+                <div class="artist-overlay"></div>
+
+                <div class="artist-info">
+
+                    <div class="artist-role">
+                        Fine Line / Botanical
+                    </div>
+
+                    <div class="artist-name">
+
+                        MAYA
+
+                        <span class="artist-number">
+                            01
+                        </span>
+
+                    </div>
+
+                    <p>
+                        Precision-focused custom work.
+                    </p>
+
+                </div>
+
+            </article>
+
+
+            <article class="artist tilt reveal reveal-delay-1">
+
+                <img
+                    src="https://images.pexels.com/photos/6593511/pexels-photo-6593511.jpeg?auto=compress&cs=tinysrgb&w=1300"
+                    alt="Tattoo artist using tattoo equipment"
+                >
+
+                <div class="artist-overlay"></div>
+
+                <div class="artist-info">
+
+                    <div class="artist-role">
+                        Blackwork / Graphic
+                    </div>
+
+                    <div class="artist-name">
+
+                        RIVEN
+
+                        <span class="artist-number">
+                            02
+                        </span>
+
+                    </div>
+
+                    <p>
+                        Bold compositions and heavy contrast.
+                    </p>
+
+                </div>
+
+            </article>
+
+
+            <article class="artist tilt reveal reveal-delay-2">
+
+                <img
+                    src="https://images.pexels.com/photos/29211911/pexels-photo-29211911.jpeg?auto=compress&cs=tinysrgb&w=1300"
+                    alt="Professional tattoo artist in studio"
+                >
+
+                <div class="artist-overlay"></div>
+
+                <div class="artist-info">
+
+                    <div class="artist-role">
+                        Realism / Portrait
+                    </div>
+
+                    <div class="artist-name">
+
+                        KAI
+
+                        <span class="artist-number">
+                            03
+                        </span>
+
+                    </div>
+
+                    <p>
+                        Detail-heavy realism and portraits.
+                    </p>
+
+                </div>
+
+            </article>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ======================================================
+     HORIZONTAL PORTFOLIO
+====================================================== -->
+
+<section id="work" class="work-section">
+
+    <div class="container">
+
+        <div class="section-top reveal">
+
+            <div>
+
+                <div class="section-kicker">
+                    04 / Selected work
+                </div>
+
+                <h2 class="section-title">
+                    THE<br>
+                    ARCHIVE.
+                </h2>
+
+            </div>
+
+            <p class="section-copy">
+
+                A selection of tattooing, studio process,
+                equipment and piercing direction.
+
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="work-track-wrap">
+
+        <div class="work-track" id="workTrack">
+
+
+            <article class="work-card large">
+
+                <img
+                    src="https://images.pexels.com/photos/34123329/pexels-photo-34123329.jpeg?auto=compress&cs=tinysrgb&w=1600"
+                    alt="Tattoo artist working"
+                >
+
+                <div class="work-info">
+
+                    <div>
+
+                        <span>
+                            01 / Studio
+                        </span>
+
+                        <h3>
+                            The Session
+                        </h3>
+
+                    </div>
+
+                    <span>
+                        ↗
+                    </span>
+
+                </div>
+
+            </article>
+
+
+            <article class="work-card">
+
+                <img
+                    src="https://images.pexels.com/photos/20509829/pexels-photo-20509829.jpeg?auto=compress&cs=tinysrgb&w=1400"
+                    alt="Tattoo machine close-up"
+                >
+
+                <div class="work-info">
+
+                    <div>
+
+                        <span>
+                            02 / Process
+                        </span>
+
+                        <h3>
+                            The Machine
+                        </h3>
+
+                    </div>
+
+                    <span>
+                        ↗
+                    </span>
+
+                </div>
+
+            </article>
+
+
+            <article class="work-card">
+
+                <img
+                    src="https://images.pexels.com/photos/6425444/pexels-photo-6425444.jpeg?auto=compress&cs=tinysrgb&w=1400"
+                    alt="Tattoo artist creating artwork"
+                >
+
+                <div class="work-info">
+
+                    <div>
+
+                        <span>
+                            03 / Ink
+                        </span>
+
+                        <h3>
+                            Black Ink
+                        </h3>
+
+                    </div>
+
+                    <span>
+                        ↗
+                    </span>
+
+                </div>
+
+            </article>
+
+
+            <article class="work-card large">
+
+                <img
+                    src="https://images.pexels.com/photos/7400018/pexels-photo-7400018.jpeg?auto=compress&cs=tinysrgb&w=1600"
+                    alt="Ear with multiple piercings"
+                >
+
+                <div class="work-info">
+
+                    <div>
+
+                        <span>
+                            04 / Jewelry
+                        </span>
+
+                        <h3>
+                            Curated Ear
+                        </h3>
+
+                    </div>
+
+                    <span>
+                        ↗
+                    </span>
+
+                </div>
+
+            </article>
+
+
+            <article class="work-card">
+
+                <img
+                    src="https://images.pexels.com/photos/15799256/pexels-photo-15799256.jpeg?auto=compress&cs=tinysrgb&w=1400"
+                    alt="Professional ear piercing jewelry"
+                >
+
+                <div class="work-info">
+
+                    <div>
+
+                        <span>
+                            05 / Piercing
+                        </span>
+
+                        <h3>
+                            Jewelry
+                        </h3>
+
+                    </div>
+
+                    <span>
+                        ↗
+                    </span>
+
+                </div>
+
+            </article>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ======================================================
+     PROCESS
+====================================================== -->
+
+<section>
+
+    <div class="container">
+
+        <div class="process">
+
+            <div class="process-intro reveal">
+
+                <div class="section-kicker">
+                    05 / Process
+                </div>
+
+                <h2>
+                    FROM<br>
+                    IDEA<br>
+                    TO INK.
+                </h2>
+
+                <p>
+
+                    No mystery. No rushed decisions.
+                    Just a clear path from your first idea
+                    to the final piece.
+
+                </p>
+
+            </div>
+
+
+            <div class="process-list">
+
+
+                <div class="process-row reveal">
+
+                    <div class="process-number">
+                        01
+                    </div>
+
+                    <div>
+
+                        <div class="process-name">
+                            Tell us the idea
+                        </div>
+
+                        <div class="process-description">
+                            Concept, references, placement and direction.
+                        </div>
+
+                    </div>
+
+                    <div class="process-arrow">
+                        ↗
+                    </div>
+
+                </div>
+
+
+                <div class="process-row reveal">
+
+                    <div class="process-number">
+                        02
+                    </div>
+
+                    <div>
+
+                        <div class="process-name">
+                            Match the artist
+                        </div>
+
+                        <div class="process-description">
+                            We connect your idea with the appropriate style.
+                        </div>
+
+                    </div>
+
+                    <div class="process-arrow">
+                        ↗
+                    </div>
+
+                </div>
+
+
+                <div class="process-row reveal">
+
+                    <div class="process-number">
+                        03
+                    </div>
+
+                    <div>
+
+                        <div class="process-name">
+                            Refine the design
+                        </div>
+
+                        <div class="process-description">
+                            The concept becomes a considered visual direction.
+                        </div>
+
+                    </div>
+
+                    <div class="process-arrow">
+                        ↗
+                    </div>
+
+                </div>
+
+
+                <div class="process-row reveal">
+
+                    <div class="process-number">
+                        04
+                    </div>
+
+                    <div>
+
+                        <div class="process-name">
+                            Make it real
+                        </div>
+
+                        <div class="process-description">
+                            The approved artwork moves into the session.
+                        </div>
+
+                    </div>
+
+                    <div class="process-arrow">
+                        ↗
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ======================================================
+     PIERCING
+====================================================== -->
+
+<section id="piercing">
+
+    <div class="container">
+
+        <div class="piercing-wrap">
+
+
+            <div class="piercing-image reveal">
+
+                <img
+                    src="https://images.pexels.com/photos/7400018/pexels-photo-7400018.jpeg?auto=compress&cs=tinysrgb&w=1800"
+                    alt="Multiple ear piercings with jewelry"
+                >
+
+                <div class="piercing-glow"></div>
+
+            </div>
+
+
+            <div class="piercing-content reveal">
+
+                <div class="section-kicker">
+                    06 / Piercing
+                </div>
+
+                <h2>
+                    JEWELRY<br>
+                    WITH<br>
+                    INTENT.
+                </h2>
+
+                <p>
+
+                    Piercing is treated as part of the overall
+                    composition. Placement, jewelry and balance
+                    work together to create a considered result.
+
+                </p>
+
+
+                <div class="piercing-options">
+
+
+                    <div class="piercing-option">
+
+                        <strong>
+                            Lobe
+                        </strong>
+
+                        <span>
+                            Classic placement
+                        </span>
+
+                    </div>
+
+
+                    <div class="piercing-option">
+
+                        <strong>
+                            Helix
+                        </strong>
+
+                        <span>
+                            Upper-ear styling
+                        </span>
+
+                    </div>
+
+
+                    <div class="piercing-option">
+
+                        <strong>
+                            Tragus
+                        </strong>
+
+                        <span>
+                            Minimal detail
+                        </span>
+
+                    </div>
+
+
+                    <div class="piercing-option">
+
+                        <strong>
+                            Nostril
+                        </strong>
+
+                        <span>
+                            Facial jewelry
+                        </span>
+
+                    </div>
+
+
+                    <div class="piercing-option">
+
+                        <strong>
+                            Septum
+                        </strong>
+
+                        <span>
+                            Statement jewelry
+                        </span>
+
+                    </div>
+
+
+                    <div class="piercing-option">
+
+                        <strong>
+                            Curated Ear
+                        </strong>
+
+                        <span>
+                            Multiple-piece styling
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ======================================================
+     EQUIPMENT
+====================================================== -->
+
+<section class="equipment">
+
+    <div class="equipment-image">
+
+        <img
+            src="https://images.pexels.com/photos/7005731/pexels-photo-7005731.jpeg?auto=compress&cs=tinysrgb&w=2200"
+            alt="Tattoo artist preparing equipment"
+        >
+
+    </div>
+
+
+    <div class="container equipment-content">
+
+        <div class="section-kicker">
+            07 / Craft
+        </div>
+
+        <h2>
+            THE<br>
+            TOOLS<br>
+            <span>MATTER.</span>
+        </h2>
+
+        <p>
+
+            The visual language of tattooing lives in the
+            details: machine, ink, line, composition and hand.
+
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- ======================================================
+     STATS
+====================================================== -->
+
+<section>
+
+    <div class="container">
+
+        <div class="stats-grid reveal">
+
+
+            <div class="big-stat">
+
+                <div
+                    class="big-number"
+                    data-count="1200"
+                >
+                    0
+                </div>
+
+                <p>
+                    Custom projects
+                </p>
+
+            </div>
+
+
+            <div class="big-stat">
+
+                <div
+                    class="big-number"
+                    data-count="8"
+                >
+                    0
+                </div>
+
+                <p>
+                    Years creating
+                </p>
+
+            </div>
+
+
+            <div class="big-stat">
+
+                <div
+                    class="big-number"
+                    data-count="3"
+                >
+                    0
+                </div>
+
+                <p>
+                    Resident artists
+                </p>
+
+            </div>
+
+
+            <div class="big-stat">
+
+                <div
+                    class="big-number"
+                    data-count="100"
+                    data-suffix="%"
+                >
+                    0
+                </div>
+
+                <p>
+                    Custom focused
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ======================================================
+     TESTIMONIALS
+====================================================== -->
+
+<section>
+
+    <div class="container">
+
+        <div class="section-top reveal">
+
+            <div>
+
+                <div class="section-kicker">
+                    08 / Client notes
+                </div>
+
+                <h2 class="section-title">
+                    WORD<br>
+                    AROUND.
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <div class="testimonials">
+
+
+            <article class="testimonial reveal">
+
+                <div class="stars">
+                    ★★★★★
+                </div>
+
+                <p class="testimonial-text">
+
+                    "The whole experience felt considered
+                    from the first conversation to the final
+                    artwork."
+
+                </p>
+
+                <div class="client">
+
+                    <div class="client-avatar">
+                        A
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Alex
+                        </strong>
+
+                        <span>
+                            Custom piece
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+
+            <article class="testimonial reveal reveal-delay-1">
+
+                <div class="stars">
+                    ★★★★★
+                </div>
+
+                <p class="testimonial-text">
+
+                    "The artist actually listened to what I
+                    wanted instead of forcing a template."
+
+                </p>
+
+                <div class="client">
+
+                    <div class="client-avatar">
+                        R
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Riya
+                        </strong>
+
+                        <span>
+                            Fine line
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+
+            <article class="testimonial reveal reveal-delay-2">
+
+                <div class="stars">
+                    ★★★★★
+                </div>
+
+                <p class="testimonial-text">
+
+                    "Clean, modern and completely different
+                    from the typical tattoo shop experience."
+
+                </p>
+
+                <div class="client">
+
+                    <div class="client-avatar">
+                        J
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Jordan
+                        </strong>
+
+                        <span>
+                            Blackwork
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ======================================================
+     FAQ
+====================================================== -->
+
+<section id="faq">
+
+    <div class="container">
+
+        <div class="section-top reveal">
+
+            <div>
+
+                <div class="section-kicker">
+                    09 / FAQ
+                </div>
+
+                <h2 class="section-title">
+                    BEFORE<br>
+                    YOU BOOK.
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <div class="faq">
+
+
+            <div class="faq-item">
+
+                <button class="faq-question">
+
+                    <span>
+                        Do you create custom designs?
+                    </span>
+
+                    <span class="faq-plus">
+                        +
+                    </span>
+
+                </button>
+
+                <div class="faq-answer">
+
+                    <div class="faq-answer-inner">
+
+                        <p>
+                            Yes. Custom concepts are developed
+                            around your idea, references, placement
+                            and the selected artist's style.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="faq-item">
+
+                <button class="faq-question">
+
+                    <span>
+                        Can I choose my artist?
+                    </span>
+
+                    <span class="faq-plus">
+                        +
+                    </span>
+
+                </button>
+
+                <div class="faq-answer">
+
+                    <div class="faq-answer-inner">
+
+                        <p>
+                            Yes. You can request a particular
+                            artist during the booking process,
+                            subject to their availability.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="faq-item">
+
+                <button class="faq-question">
+
+                    <span>
+                        How does the consultation work?
+                    </span>
+
+                    <span class="faq-plus">
+                        +
+                    </span>
+
+                </button>
+
+                <div class="faq-answer">
+
+                    <div class="faq-answer-inner">
+
+                        <p>
+                            You provide your concept and references.
+                            The studio then confirms the appropriate
+                            artist and next steps.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="faq-item">
+
+                <button class="faq-question">
+
+                    <span>
+                        What are the age requirements?
+                    </span>
+
+                    <span class="faq-plus">
+                        +
+                    </span>
+
+                </button>
+
+                <div class="faq-answer">
+
+                    <div class="faq-answer-inner">
+
+                        <p>
+                            Requirements vary by location and service.
+                            The studio should confirm eligibility and
+                            any required consent before accepting a
+                            booking.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="faq-item">
+
+                <button class="faq-question">
+
+                    <span>
+                        Do you accept walk-ins?
+                    </span>
+
+                    <span class="faq-plus">
+                        +
+                    </span>
+
+                </button>
+
+                <div class="faq-answer">
+
+                    <div class="faq-answer-inner">
+
+                        <p>
+                            Walk-in availability depends on the
+                            studio schedule. Booking ahead is
+                            recommended for custom work.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ======================================================
+     BOOKING CTA
+====================================================== -->
+
+<section
+    class="booking"
+    id="booking"
+>
+
+    <div class="container">
+
+        <div class="booking-box reveal">
+
+            <div class="booking-ring"></div>
+
+            <div class="section-kicker">
+                10 / Booking
+            </div>
+
+            <h2>
+                HAVE AN<br>
+                <span>IDEA?</span>
+            </h2>
+
+            <p>
+
+                Tell us what you're imagining.
+                We'll start from there.
+
+            </p>
+
+            <button
+                class="btn btn-primary booking-btn magnetic"
+                data-booking
+            >
+                <span>START A BOOKING →</span>
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ======================================================
+     FOOTER
+====================================================== -->
+
+<footer>
+
+    <div class="container">
+
+        <div class="footer-main">
+
+
+            <div class="footer-brand">
+
+                <a href="#" class="nav-logo">
+
+                    <div class="logo-symbol">
+                        N
+                    </div>
+
+                    NOIR<span>/INK</span>
+
+                </a>
+
+                <p>
+
+                    Independent tattoo + piercing studio.
+                    Custom artwork, professional service and
+                    a visual experience built around the work.
+
+                </p>
+
+            </div>
+
+
+            <div class="footer-columns">
+
+
+                <div class="footer-column">
+
+                    <strong>
+                        Explore
+                    </strong>
+
+                    <a href="#services">
+                        Services
+                    </a>
+
+                    <a href="#artists">
+                        Artists
+                    </a>
+
+                    <a href="#work">
+                        Work
+                    </a>
+
+                    <a href="#piercing">
+                        Piercing
+                    </a>
+
+                </div>
+
+
+                <div class="footer-column">
+
+                    <strong>
+                        Studio
+                    </strong>
+
+                    <a href="#faq">
+                        FAQ
+                    </a>
+
+                    <a href="#booking">
+                        Booking
+                    </a>
+
+                    <a href="#">
+                        Instagram
+                    </a>
+
+                    <a href="#">
+                        Contact
+                    </a>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+        <div class="footer-bottom">
+
+            <span>
+                © 2026 NOIR/INK
+            </span>
+
+            <span>
+                Designed for the next mark.
+            </span>
+
+        </div>
+
+    </div>
+
+</footer>
+
+
+<!-- ======================================================
+     BOOKING MODAL
+====================================================== -->
+
+<div class="modal" id="bookingModal">
+
+    <div class="modal-box">
+
+        <button
+            class="modal-close"
+            id="modalClose"
+        >
+            ×
+        </button>
+
+
+        <div id="bookingArea">
+
+            <div class="section-kicker">
+                Appointment request
+            </div>
+
+            <h2>
+                LET'S TALK.
+            </h2>
+
+            <p>
+                Send the basic project information and
+                the studio can follow up with the next steps.
+            </p>
+
+
+            <form id="bookingForm">
+
+                <div class="form-grid">
+
+
+                    <div class="field">
+
+                        <label>
+                            Name
+                        </label>
+
+                        <input
+                            type="text"
+                            placeholder="Your name"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label>
+                            Email
+                        </label>
+
+                        <input
+                            type="email"
+                            placeholder="you@example.com"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label>
+                            Service
+                        </label>
+
+                        <select required>
+
+                            <option value="">
+                                Select service
+                            </option>
+
+                            <option>
+                                Custom Tattoo
+                            </option>
+
+                            <option>
+                                Fine Line
+                            </option>
+
+                            <option>
+                                Blackwork
+                            </option>
+
+                            <option>
+                                Realism
+                            </option>
+
+                            <option>
+                                Cover Up
+                            </option>
+
+                            <option>
+                                Piercing
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label>
+                            Artist
+                        </label>
+
+                        <select>
+
+                            <option>
+                                No preference
+                            </option>
+
+                            <option>
+                                Maya
+                            </option>
+
+                            <option>
+                                Riven
+                            </option>
+
+                            <option>
+                                Kai
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="field full">
+
+                        <label>
+                            Project idea
+                        </label>
+
+                        <textarea
+                            placeholder="Tell us about your concept, placement, approximate size and references..."
+                            required
+                        ></textarea>
+
+                    </div>
+
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="form-submit"
+                >
+                    SEND REQUEST →
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <div
+            class="form-success"
+            id="formSuccess"
+        >
+
+            <div class="success-icon">
+                ✓
+            </div>
+
+            <h2>
+                REQUEST SENT.
+            </h2>
+
+            <p>
+                This demo form has successfully captured
+                the request. Connect it to your preferred
+                backend, email service or booking platform
+                when deploying the real website.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   LOADER
+========================================================= */
+
+const loader = document.getElementById("loader");
+const progress = document.getElementById("loaderProgress");
+const loaderPercent = document.getElementById("loaderPercent");
+
+let loadValue = 0;
+
+const loadTimer = setInterval(() => {
+
+    loadValue += Math.floor(Math.random() * 9) + 4;
+
+    if(loadValue >= 100){
+
+        loadValue = 100;
+
+        clearInterval(loadTimer);
+
+        setTimeout(() => {
+
+            loader.classList.add("hide");
+
+            document.body.classList.remove("lock");
+
+            startCounters();
+
+        },400);
+
+    }
+
+    progress.style.width = loadValue + "%";
+
+    loaderPercent.textContent =
+        String(loadValue).padStart(2,"0") + "%";
+
+},80);
+
+
+/* =========================================================
+   SCROLL PROGRESS
+========================================================= */
+
+const scrollProgress =
+    document.getElementById("scrollProgress");
+
+const nav =
+    document.getElementById("nav");
+
+function updateScroll(){
+
+    const scrollTop =
+        window.scrollY;
+
+    const documentHeight =
+        document.documentElement.scrollHeight -
+        window.innerHeight;
+
+    const percent =
+        documentHeight > 0
+        ? (scrollTop / documentHeight) * 100
+        : 0;
+
+    scrollProgress.style.width =
+        percent + "%";
+
+
+    if(scrollTop > 40){
+
+        nav.classList.add("scrolled");
+
+    }else{
+
+        nav.classList.remove("scrolled");
+
+    }
+
+}
+
+window.addEventListener(
+    "scroll",
+    updateScroll,
+    {passive:true}
+);
+
+updateScroll();
+
+
+/* =========================================================
+   MOBILE MENU
+========================================================= */
+
+const menuButton =
+    document.getElementById("menuButton");
+
+const mobileMenu =
+    document.getElementById("mobileMenu");
+
+menuButton.addEventListener("click", () => {
+
+    mobileMenu.classList.toggle("open");
+
+});
+
+document
+    .querySelectorAll(".mobile-menu a")
+    .forEach(link => {
+
+        link.addEventListener("click", () => {
+
+            mobileMenu.classList.remove("open");
+
+        });
+
+    });
+
+
+/* =========================================================
+   REVEAL OBSERVER
+========================================================= */
+
+const revealObserver =
+    new IntersectionObserver(
+        entries => {
+
+            entries.forEach(entry => {
+
+                if(entry.isIntersecting){
+
+                    entry.target.classList.add("visible");
+
+                    revealObserver.unobserve(
+                        entry.target
+                    );
+
+                }
+
+            });
+
+        },
+        {
+            threshold:.12
+        }
+    );
+
+document
+    .querySelectorAll(".reveal")
+    .forEach(element => {
+
+        revealObserver.observe(element);
+
+    });
+
+
+/* =========================================================
+   MAGNETIC BUTTONS
+========================================================= */
+
+const magneticElements =
+    document.querySelectorAll(".magnetic");
+
+magneticElements.forEach(element => {
+
+    element.addEventListener(
+        "mousemove",
+        event => {
+
+            if(window.innerWidth < 700) return;
+
+            const rect =
+                element.getBoundingClientRect();
+
+            const x =
+                event.clientX -
+                rect.left -
+                rect.width / 2;
+
+            const y =
+                event.clientY -
+                rect.top -
+                rect.height / 2;
+
+            element.style.transform =
+                `translate(${x * .18}px,${y * .18}px)`;
+
+        }
+    );
+
+    element.addEventListener(
+        "mouseleave",
+        () => {
+
+            element.style.transform = "";
+
+        }
+    );
+
+});
+
+
+/* =========================================================
+   3D TILT CARDS
+========================================================= */
+
+const tiltCards =
+    document.querySelectorAll(".tilt");
+
+tiltCards.forEach(card => {
+
+    card.addEventListener(
+        "mousemove",
+        event => {
+
+            if(window.innerWidth < 800) return;
+
+            const rect =
+                card.getBoundingClientRect();
+
+            const x =
+                event.clientX - rect.left;
+
+            const y =
+                event.clientY - rect.top;
+
+            const rotateY =
+                ((x / rect.width) - .5) * 8;
+
+            const rotateX =
+                ((y / rect.height) - .5) * -8;
+
+            card.style.transform =
+                `perspective(900px)
+                 rotateX(${rotateX}deg)
+                 rotateY(${rotateY}deg)
+                 translateY(-5px)`;
+
+        }
+    );
+
+
+    card.addEventListener(
+        "mouseleave",
+        () => {
+
+            card.style.transform = "";
+
+        }
+    );
+
+});
+
+
+/* =========================================================
+   CARD GLOW FOLLOW
+========================================================= */
+
+document
+    .querySelectorAll(".service-card")
+    .forEach(card => {
+
+        const glow =
+            card.querySelector(".card-glow");
+
+        card.addEventListener(
+            "mousemove",
+            event => {
+
+                const rect =
+                    card.getBoundingClientRect();
+
+                glow.style.left =
+                    event.clientX - rect.left + "px";
+
+                glow.style.top =
+                    event.clientY - rect.top + "px";
+
+            }
+        );
+
+    });
+
+
+/* =========================================================
+   CURSOR
+========================================================= */
+
+const cursor =
+    document.getElementById("cursor");
+
+const cursorDot =
+    document.getElementById("cursorDot");
+
+let mouseX = 0;
+let mouseY = 0;
+
+let cursorX = 0;
+let cursorY = 0;
+
+document.addEventListener(
+    "mousemove",
+    event => {
+
+        mouseX = event.clientX;
+        mouseY = event.clientY;
+
+    }
+);
+
+function animateCursor(){
+
+    cursorX +=
+        (mouseX - cursorX) * .16;
+
+    cursorY +=
+        (mouseY - cursorY) * .16;
+
+    cursor.style.left =
+        cursorX + "px";
+
+    cursor.style.top =
+        cursorY + "px";
+
+    cursorDot.style.left =
+        mouseX + "px";
+
+    cursorDot.style.top =
+        mouseY + "px";
+
+    requestAnimationFrame(
+        animateCursor
+    );
+
+}
+
+animateCursor();
+
+
+document
+    .querySelectorAll(
+        "a,button,.service-card,.artist,.process-row"
+    )
+    .forEach(element => {
+
+        element.addEventListener(
+            "mouseenter",
+            () => {
+
+                cursor.classList.add("big");
+
+            }
+        );
+
+        element.addEventListener(
+            "mouseleave",
+            () => {
+
+                cursor.classList.remove("big");
+
+            }
+        );
+
+    });
+
+
+document
+    .querySelectorAll(".work-card")
+    .forEach(element => {
+
+        element.addEventListener(
+            "mouseenter",
+            () => {
+
+                cursor.classList.add("text");
+
+            }
+        );
+
+        element.addEventListener(
+            "mouseleave",
+            () => {
+
+                cursor.classList.remove("text");
+
+            }
+        );
+
+    });
+
+
+/* =========================================================
+   HORIZONTAL PORTFOLIO PARALLAX
+========================================================= */
+
+const workSection =
+    document.querySelector(".work-section");
+
+const workTrack =
+    document.getElementById("workTrack");
+
+function moveWork(){
+
+    if(window.innerWidth < 650){
+
+        workTrack.style.transform =
+            "translateX(0)";
+
+        return;
+
+    }
+
+    const rect =
+        workSection.getBoundingClientRect();
+
+    const sectionHeight =
+        workSection.offsetHeight;
+
+    const progress =
+        Math.min(
+            1,
+            Math.max(
+                0,
+                (window.innerHeight - rect.top) /
+                (window.innerHeight + sectionHeight * .5)
+            )
+        );
+
+    const maxMove =
+        Math.max(
+            0,
+            workTrack.scrollWidth -
+            window.innerWidth
+        );
+
+    workTrack.style.transform =
+        `translateX(${-maxMove * progress * .72}px)`;
+
+}
+
+window.addEventListener(
+    "scroll",
+    moveWork,
+    {passive:true}
+);
+
+window.addEventListener(
+    "resize",
+    moveWork
+);
+
+moveWork();
+
+
+/* =========================================================
+   FAQ
+========================================================= */
+
+document
+    .querySelectorAll(".faq-question")
+    .forEach(button => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                const item =
+                    button.parentElement;
+
+                const wasOpen =
+                    item.classList.contains("open");
+
+
+                document
+                    .querySelectorAll(".faq-item")
+                    .forEach(other => {
+
+                        other.classList.remove("open");
+
+                    });
+
+
+                if(!wasOpen){
+
+                    item.classList.add("open");
+
+                }
+
+            }
+        );
+
+    });
+
+
+/* =========================================================
+   COUNTERS
+========================================================= */
+
+let countersStarted = false;
+
+function startCounters(){
+
+    if(countersStarted) return;
+
+    countersStarted = true;
+
+    const counters =
+        document.querySelectorAll("[data-count]");
+
+    counters.forEach(counter => {
+
+        const target =
+            Number(counter.dataset.count);
+
+        const suffix =
+            counter.dataset.suffix || "";
+
+        let current = 0;
+
+        const duration =
+            target > 100
+            ? 1800
+            : 1100;
+
+        const start =
+            performance.now();
+
+        function update(time){
+
+            const progress =
+                Math.min(
+                    1,
+                    (time - start) / duration
+                );
+
+            const eased =
+                1 - Math.pow(1 - progress,4);
+
+            current =
+                Math.floor(target * eased);
+
+            counter.textContent =
+                current.toLocaleString() +
+                suffix;
+
+            if(progress < 1){
+
+                requestAnimationFrame(update);
+
+            }else{
+
+                counter.textContent =
+                    target.toLocaleString() +
+                    suffix;
+
+            }
+
+        }
+
+        requestAnimationFrame(update);
+
+    });
+
+}
+
+
+/* =========================================================
+   PARTICLES
+========================================================= */
+
+const particles =
+    document.getElementById("particles");
+
+for(let i = 0; i < 35; i++){
+
+    const particle =
+        document.createElement("span");
+
+    particle.className =
+        "particle";
+
+    particle.style.left =
+        Math.random() * 100 + "%";
+
+    particle.style.setProperty(
+        "--x",
+        (Math.random() * 200 - 100) + "px"
+    );
+
+    particle.style.setProperty(
+        "--duration",
+        (8 + Math.random() * 12) + "s"
+    );
+
+    particle.style.animationDelay =
+        (-Math.random() * 15) + "s";
+
+    particle.style.opacity =
+        (.05 + Math.random() * .2);
+
+    particles.appendChild(
+        particle
+    );
+
+}
+
+
+/* =========================================================
+   BOOKING MODAL
+========================================================= */
+
+const modal =
+    document.getElementById("bookingModal");
+
+const modalClose =
+    document.getElementById("modalClose");
+
+const bookingTriggers =
+    document.querySelectorAll("[data-booking]");
+
+function openModal(){
+
+    modal.classList.add("open");
+
+    document.body.classList.add("lock");
+
+}
+
+function closeModal(){
+
+    modal.classList.remove("open");
+
+    document.body.classList.remove("lock");
+
+}
+
+bookingTriggers.forEach(button => {
+
+    button.addEventListener(
+        "click",
+        openModal
+    );
+
+});
+
+
+modalClose.addEventListener(
+    "click",
+    closeModal
+);
+
+
+modal.addEventListener(
+    "click",
+    event => {
+
+        if(event.target === modal){
+
+            closeModal();
+
+        }
+
+    }
+);
+
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if(event.key === "Escape"){
+
+            closeModal();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   BOOKING FORM
+========================================================= */
+
+const bookingForm =
+    document.getElementById("bookingForm");
+
+const bookingArea =
+    document.getElementById("bookingArea");
+
+const formSuccess =
+    document.getElementById("formSuccess");
+
+bookingForm.addEventListener(
+    "submit",
+    event => {
+
+        event.preventDefault();
+
+        bookingArea.style.display =
+            "none";
+
+        formSuccess.classList.add(
+            "show"
+        );
+
+    }
+);
+
+
+/* =========================================================
+   HERO PARALLAX
+========================================================= */
+
+const heroImage =
+    document.querySelector(".hero-media img");
+
+window.addEventListener(
+    "scroll",
+    () => {
+
+        if(window.scrollY < window.innerHeight){
+
+            heroImage.style.transform =
+                `scale(1.02)
+                 translateY(${window.scrollY * .06}px)`;
+
+        }
+
+    },
+    {passive:true}
+);
+
+
+/* =========================================================
+   KEYBOARD ACCESS
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if(event.key === "Tab"){
+
+            document.body.classList.add(
+                "keyboard-user"
+            );
+
+        }
+
+    }
+);
+
+</script>
+
+</body>
+</html>
